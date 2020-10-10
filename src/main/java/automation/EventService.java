@@ -8,6 +8,7 @@ import automation.pojos.Devices;
 import automation.producer.KafkaProducer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,9 @@ import java.util.Map;
 public class EventService {
 
     public final String devices_url = "https://api.smartthings.com/v1/devices";
+
+    @Value(value = "${kafka.enabled}")
+    private String kafkaEnabled;
 
     @Autowired
     HttpClient client;
@@ -34,7 +38,12 @@ public class EventService {
             final DeviceHandler handler = DeviceType.getType(device.getDeviceTypeId()).getHandler();
             if(handler.deviceSupported()){
                 final Map<String,String> deviceStatus =  handler.getMappedResponse(device);
-                producer.sendMessage(mapper.writeValueAsString(deviceStatus));
+
+                if(kafkaEnabled.equalsIgnoreCase("true")) {
+                    producer.sendMessage(mapper.writeValueAsString(deviceStatus));
+                } else {
+                    System.out.println(mapper.writeValueAsString(deviceStatus));
+                }
             }
         }
     }
