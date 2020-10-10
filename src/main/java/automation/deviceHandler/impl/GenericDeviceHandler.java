@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class GenericDeviceHandler implements DeviceHandler {
 
@@ -20,7 +21,7 @@ public class GenericDeviceHandler implements DeviceHandler {
 
     final ObjectMapper mapper = new ObjectMapper();
 
-    protected final Map<String,String> deviceStatusMap = new HashMap<>();
+    protected final Map<String,String> responseMap = new HashMap<>();
 
     @Override
     public String response(final Device device) throws IOException {
@@ -29,37 +30,34 @@ public class GenericDeviceHandler implements DeviceHandler {
     }
 
     @Override
-    public boolean stateChanged(final Device device) throws IOException {
+    public Map<String,String> getMappedResponse(final Device device) throws IOException {
+        final ValueTimeStamp switchValueTimeStamp = getSwitchValueTimeStamp(device);
+        final ValueTimeStamp powerValueTimeStamp = getPowerValueTimeStamp(device,switchValueTimeStamp);
+        responseMap.put("DeviceName",device.getLabel());
+        responseMap.put("SwitchStatus",switchValueTimeStamp.getValue());
+        responseMap.put("Timestamp",switchValueTimeStamp.getTimestamp());
+        responseMap.put("powerConsumption",powerValueTimeStamp.getValue());
+        return responseMap;
+    }
+
+    protected ValueTimeStamp getPowerValueTimeStamp(final Device device, final ValueTimeStamp switchValueTimeStamp) throws IOException {
+        boolean isON = switchValueTimeStamp.getValue().equalsIgnoreCase("on");
+        final Float f = isON ? new Random().nextFloat()*(7 - 5) + 5 : 0;
+        final ValueTimeStamp valueTimeStamp = new ValueTimeStamp();
+        valueTimeStamp.setValue(f.toString());
+        return valueTimeStamp;
+    }
+
+    private ValueTimeStamp getSwitchValueTimeStamp(Device device) throws IOException {
         final String deviceStatus = String.format(devices_status,device.getDeviceId());
         final String statusJsonResponse = client.response(deviceStatus);
         final JsonNode json = mapper.readTree(statusJsonResponse);
         final JsonNode switchNode = json.get("components").get("main").get("switch").get("switch");
-        final ValueTimeStamp valueTimeStampValue =  mapper.treeToValue(switchNode, ValueTimeStamp.class);
-
-        if(deviceStatusMap.get(device.getDeviceId()) == null) {
-            deviceStatusMap.put(device.getDeviceId(), valueTimeStampValue.getValue());
-            return true;
-        }
-
-        if(checkStateChange(valueTimeStampValue,device,deviceStatusMap)) {
-            return true;
-        }
-        return false;
+        return mapper.treeToValue(switchNode, ValueTimeStamp.class);
     }
 
     @Override
     public boolean deviceSupported() {
         return true;
-    }
-
-    protected boolean checkStateChange(final ValueTimeStamp valueTimeStampValue, final Device device , final Map<String,String> stateMap) {
-        if (!valueTimeStampValue.getValue().equals(stateMap.get(device.getDeviceId()))) {
-            System.out.println("ValueTimeStamp state change for "+device.getLabel() +
-                " old state : " +stateMap.get(device.getDeviceId()) +
-                " new state : "+ valueTimeStampValue.getValue());
-            stateMap.put(device.getDeviceId(), valueTimeStampValue.getValue());
-            return true;
-        }
-        return false;
     }
 }

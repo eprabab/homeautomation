@@ -4,6 +4,8 @@ import automation.deviceHandler.DeviceHandler;
 import automation.pojos.Device;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
 
 public class UnsupportedDeviceHandler implements DeviceHandler {
     @Override
@@ -12,8 +14,8 @@ public class UnsupportedDeviceHandler implements DeviceHandler {
     }
 
     @Override
-    public boolean stateChanged(Device device) throws IOException {
-        return false;
+    public Map<String, String> getMappedResponse(Device device) throws IOException {
+        return Collections.emptyMap();
     }
 
     @Override
