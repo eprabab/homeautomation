@@ -6,14 +6,13 @@
 
 	<groupId>com.apache</groupId>
 	<artifactId>homeautomation</artifactId>
+	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
 	<properties>
 		<target.dir>target</target.dir>
 	</properties>
 
 	<build>
-		<outputDirectory>${basedir}/${target.dir}/classes</outputDirectory>
-		<testOutputDirectory>${basedir}/${target.dir}/test-classes</testOutputDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -25,44 +24,46 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-				<version>1.4.3</version>
-				<executions>
-					<execution>
-						<id>default</id>
-						<goals>
-							<goal>build</goal>
-							<goal>tag</goal>
-							<goal>push</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<repository>docker.io/eprabab/home_automation</repository>
-					<tag>${project.version}</tag>
-					<username>eprabab</username>
-					<password>c94dfc91-de4b-42f9-9360-ba091dc697c8</password>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.0.3.RELEASE</version>
 				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>automation.HomeAutomation</mainClass>
-						</manifest>
-					</archive>
+					<mainClass>automation.HomeAutomation</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>docker-push</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.spotify</groupId>
+						<artifactId>dockerfile-maven-plugin</artifactId>
+						<version>1.4.3</version>
+						<executions>
+							<execution>
+								<id>default</id>
+								<goals>
+									<goal>build</goal>
+									<goal>tag</goal>
+									<goal>push</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<repository>docker.io/eprabab/home_automation</repository>
+							<tag>${project.version}</tag>
+							<username>eprabab</username>
+							<password>c94dfc91-de4b-42f9-9360-ba091dc697c8</password>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>

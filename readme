@@ -1,0 +1,10 @@
+Packaging steps
+---------------
+mvn clean install
+mvn package spring-boot:repackage -P docker-push
+
+Helm install
+---------------------------
+cd Helm/
+helm install <release_name> homeautomation -n <namespace>
+helm uninstall <release_name> -n <namespace>
