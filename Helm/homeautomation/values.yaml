@@ -7,6 +7,8 @@ replicaCount: 1
 image:
   repository: eprabab/home_automation
   tag: 1.0-SNAPSHOT
+  imagePullPolicy: Always
+  command: [ "echo", "SUCCESS" ]
 
 imagePullSecrets:
-- name: regcred
+- name: dockerhubsecret
