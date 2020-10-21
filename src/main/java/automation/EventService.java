@@ -6,6 +6,7 @@ import automation.httpClient.HttpClient;
 import automation.pojos.Device;
 import automation.pojos.Devices;
 import automation.producer.KafkaProducer;
+import automation.writer.CsvWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,13 +22,22 @@ public class EventService {
     public final String devices_url = "https://api.smartthings.com/v1/devices";
 
     @Value(value = "${kafka.enabled}")
-    private String kafkaEnabled;
+    private boolean kafkaEnabled;
+
+    @Value(value = "${csv.enabled}")
+    private boolean writeToCsv;
+
+    @Value(value = "${verbose}")
+    private boolean verbose;
 
     @Autowired
     HttpClient client;
 
     @Autowired
     KafkaProducer producer;
+
+    @Autowired
+    CsvWriter csvWriter;
 
     final ObjectMapper mapper = new ObjectMapper();
 
@@ -39,10 +49,16 @@ public class EventService {
             if(handler.deviceSupported()){
                 final Map<String,String> deviceStatus =  handler.getMappedResponse(device);
 
-                if(kafkaEnabled.equalsIgnoreCase("true")) {
-                    producer.sendMessage(mapper.writeValueAsString(deviceStatus));
-                } else {
+                if(verbose) {
                     System.out.println(mapper.writeValueAsString(deviceStatus));
+                }
+
+                if(writeToCsv) {
+                    csvWriter.writeToCsv(deviceStatus);
+                }
+
+                if(kafkaEnabled) {
+                    producer.sendMessage(mapper.writeValueAsString(deviceStatus));
                 }
             }
         }
