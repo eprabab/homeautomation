@@ -3,6 +3,7 @@ package automation;
 import automation.deviceHandler.DeviceHandler;
 import automation.enums.DeviceType;
 import automation.httpClient.HttpClient;
+import automation.metrics.ApplicationMetrics;
 import automation.pojos.Device;
 import automation.pojos.Devices;
 import automation.producer.KafkaProducer;
@@ -39,6 +40,9 @@ public class EventService {
     @Autowired
     CsvWriter csvWriter;
 
+    @Autowired
+    ApplicationMetrics metrics;
+
     final ObjectMapper mapper = new ObjectMapper();
 
     @Scheduled(fixedRate = 2000)
@@ -48,6 +52,7 @@ public class EventService {
             final DeviceHandler handler = DeviceType.getType(device.getDeviceTypeId()).getHandler();
             if(handler.deviceSupported()){
                 final Map<String,String> deviceStatus =  handler.getMappedResponse(device);
+                metrics.processMetrics(deviceStatus.get("DeviceName"),new Float(deviceStatus.get("powerConsumption")));
 
                 if(verbose) {
                     System.out.println(mapper.writeValueAsString(deviceStatus));

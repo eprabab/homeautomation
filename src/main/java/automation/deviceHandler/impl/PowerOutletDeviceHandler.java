@@ -16,4 +16,9 @@ public class PowerOutletDeviceHandler extends GenericDeviceHandler {
         final JsonNode switchNode = json.get("components").get("main").get("powerMeter").get("power");
         return mapper.treeToValue(switchNode, ValueTimeStamp.class);
     }
+
+    @Override
+    public boolean deviceSupported() {
+        return true;
+    }
 }
