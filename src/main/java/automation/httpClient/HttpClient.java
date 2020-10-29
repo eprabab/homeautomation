@@ -2,6 +2,7 @@ package automation.httpClient;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -20,6 +21,9 @@ public class HttpClient {
         request.addHeader(HttpHeaders.AUTHORIZATION,"Bearer b842e6df-3097-4044-907b-6c61a12461e7");
 
         final CloseableHttpResponse response = httpClient.execute(request);
+        if(response.getStatusLine().getStatusCode() != HttpStatus.SC_OK){
+            throw new RuntimeException(response.getEntity().toString());
+        }
         final HttpEntity entity = response.getEntity();
 
         return EntityUtils.toString(entity);
