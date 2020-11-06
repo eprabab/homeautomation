@@ -26,3 +26,30 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
+
+
+{{/*
+Connection to messagebuskf
+*/}}
+{{- define "homeautomation.messagebuskf.connectHost" -}}
+{{- printf "%s:%s/" .Values.messagebuskf.clientServiceName  .Values.messagebuskf.clientPort -}}
+{{- end -}}
+
+{{/*
+Connection to messagebuskf with chroot
+*/}}
+{{- define "homeautomation.messagebuskf.connect" -}}
+{{ template "homeautomation.messagebuskf.connectHost" . }}{{ template "homeautomation.name" . }}
+{{- end -}}
+
+{{/*
+Image path for the chart
+*/}}
+{{- define "homeautomation.imagePath" -}}
+{{- $registryUrl := .Values.image.url }}
+{{- $image := .Values.image.repository -}}
+{{- $tag := .Values.image.tag -}}
+
+{{- $imagePath := printf "%s/%s:%s" $registryUrl  $image $tag -}}
+{{- print (regexReplaceAll "[/]+" $imagePath "/") -}}
+{{- end -}}

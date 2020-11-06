@@ -5,6 +5,7 @@
 replicaCount: 1
 
 image:
+  url: docker.io
   repository: eprabab/home_automation
   tag: 1.0-SNAPSHOT
   imagePullPolicy: Always
@@ -12,3 +13,13 @@ image:
 
 imagePullSecrets:
 - name: dockerhubsecret
+
+kafka:
+  enabled: true
+  bootstrapAddress: test
+  
+messagebuskf:
+   # The name of the Data Coordinator ZK service
+   clientServiceName: "eric-data-message-bus-kf"
+   # The port that the Data Coordinator ZK service listens on
+   clientPort: "9092"
