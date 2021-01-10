@@ -3,6 +3,11 @@ Packaging steps
 mvn clean package spring-boot:repackage
 mvn install -P docker-push
 
+K8s install
+-----------
+kubectl apply -f homeautomation.yaml
+
+
 Helm install
 ---------------------------
 cd Helm/
