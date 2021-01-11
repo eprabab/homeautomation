@@ -14,8 +14,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Properties;
 
 @Component
 public class EventService {
@@ -55,7 +59,15 @@ public class EventService {
                 metrics.processMetrics(deviceStatus.get("DeviceName"),new Float(deviceStatus.get("powerConsumption")));
 
                 if(verbose) {
-                    System.out.println(mapper.writeValueAsString(deviceStatus));
+                    if(Files.exists(Paths.get("/config/external.properties"))){
+                        Properties prop = new Properties();
+                        prop.load(new FileReader("/config/external.properties"));
+                        if(prop.getProperty("deviceName").equalsIgnoreCase(deviceStatus.get("DeviceName"))) {
+                            System.out.println(mapper.writeValueAsString(deviceStatus));
+                        }
+                    } else {
+                        System.out.println(mapper.writeValueAsString(deviceStatus));
+                    }
                 }
 
                 if(writeToCsv) {

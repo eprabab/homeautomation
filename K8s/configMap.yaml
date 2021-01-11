@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homeautomation-configmap
+data:
+  testKey: "testValue"
+
+  external.properties: |
+    deviceName=TV
+    verbose=true

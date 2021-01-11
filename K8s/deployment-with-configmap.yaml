@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "homeautomation.name" . }}
+  name: homeautomation
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 2
   selector:
     matchLabels:
-      app: {{ include "homeautomation.name" . }}
+      app: homeautomation_pods
   template:
     metadata:
       labels:
-        app: {{ include "homeautomation.name" . }}
+        app: homeautomation_pods
     spec:
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        - name: homeautomation-container
+          image: "eprabab/home_automation:1.0-SNAPSHOT"
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
@@ -31,7 +31,7 @@ spec:
       volumes:
         - name: configmap-volume
           configMap:
-            name: homeautomation-configmap
-            items:
-              - key: "external.properties"
-                path: "external.properties"
+           name: homeautomation-configmap
+           items:
+            - key: "external.properties"
+              path: "external.properties"
