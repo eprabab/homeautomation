@@ -18,7 +18,7 @@ public class HttpClient {
     public final String response(final String url) throws IOException {
         final CloseableHttpClient httpClient = HttpClients.createDefault();
         final HttpGet request = new HttpGet(url);
-        request.addHeader(HttpHeaders.AUTHORIZATION,"Bearer b842e6df-3097-4044-907b-6c61a12461e7");
+        request.addHeader(HttpHeaders.AUTHORIZATION,"Bearer ");
 
         final CloseableHttpResponse response = httpClient.execute(request);
         if(response.getStatusLine().getStatusCode() != HttpStatus.SC_OK){
